@@ -1,14 +1,24 @@
 import {  
 	SEND_AUTH_DETAILS, 
-	ERROR_AUTHENTICATING,
-	SAVE_USER_DETAILS
+	SAVE_USER_DETAILS,
+	SET_AUTH_ERROR,
+	LOGOUT,
+	SET_TOKEN,
+	TRY_AUTO_AUTH,
+	SET_AUTO_AUTH_ERROR,
+	AUTO_LOGIN_TO
  } from '../actions/AuthActions';
 
 const initialState = {
 	token: null,
 	authenticating: false,
 	authError: null,
-	userDetails: null
+	userDetails: null,
+	
+	//Auto sign in
+	tryingAutoAuth: false,
+	autoAuthError: null,
+	autoLoginTo: 'AutoLogin' //AutoLogin,Login,Track
 };
 
 export default function auth (state = initialState, action) {
@@ -20,7 +30,7 @@ export default function auth (state = initialState, action) {
 			authError: null
 		}
 	break;
-	case ERROR_AUTHENTICATING:
+	case SET_AUTH_ERROR:
 		return {
 			...state,
 			authenticating: false,
@@ -33,6 +43,34 @@ export default function auth (state = initialState, action) {
 			authenticating: false,
 			authError: null,
 			userDetails: action.userDetails
+		}
+	break;
+	case LOGOUT:
+		return initialState;
+	break;
+	case SET_TOKEN:
+		return {
+			...state,
+			token: action.token
+		}
+	break;
+	case TRY_AUTO_AUTH:
+		return {
+			...state,
+			tryingAutoAuth: true,
+			autoAuthError: null
+		}
+	break;
+	case SET_AUTO_AUTH_ERROR:
+		return {
+			...state,
+			autoAuthError: action.message
+		}
+	break;
+	case AUTO_LOGIN_TO:
+		return {
+			...state,
+			autoLoginTo: action.screen
 		}
 	break;
     default:

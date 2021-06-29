@@ -17,7 +17,6 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
 import {
   Colors,
   DebugInstructions,
@@ -38,6 +37,8 @@ import Tests from './src/screens/Tests';
 import TestDetails from './src/screens/TestDetails';
 import Info from './src/screens/Info';
 import Settings from './src/screens/Settings';
+import Register from './src/screens/Register';
+import AutoLogin from './src/screens/AutoLogin';
 
 const AppNavigator = createStackNavigator({
 	Login: {
@@ -64,10 +65,19 @@ const AppNavigator = createStackNavigator({
 	},
 	Settings: {
 		screen: Settings
+	},
+	Register: {
+		screen: Register
+	},
+	AutoLogin: {
+		screen: AutoLogin,
+		navigationOptions: {
+			headerShown: false,
+		}
 	}
 },
 {
-    initialRouteName: 'Login',
+    initialRouteName: 'AutoLogin',
 });
 
 const AppContainer = createAppContainer(AppNavigator);

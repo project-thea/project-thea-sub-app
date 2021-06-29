@@ -12,12 +12,20 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, ListItem, Divider } from 'react-native-elements';
 import Colors from '../shared/Colors';
 import Footer from '../shared/Footer';
+import { logout } from '../actions/AuthActions';
 
 const Settings = (props) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 	const [server, setServer] = useState('');
+	
+	useEffect(() => {
+		if(props.userDetails === null || props.userDetails === undefined){
+			props.navigation.navigate('Login');
+		}
+	}, [props.userDetails]);
+	
 	
 	return (
 	<View style={{flex: 1}}>
@@ -99,6 +107,7 @@ const Settings = (props) => {
 				  buttonStyle={{
 					  backgroundColor: 'red'
 				  }}
+				  onPress={() => props.dispatch(logout())}
 				/>
 				
 				<Button
@@ -121,7 +130,7 @@ const Settings = (props) => {
 
 function mapStateToProps(state) {
 	return { 
-
+		userDetails: state.auth.userDetails
 	}
 }
 
