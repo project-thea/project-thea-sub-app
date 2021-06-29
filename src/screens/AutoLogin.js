@@ -15,7 +15,12 @@ const AutoLogin = (props) => {
 	
 	useEffect(() => {
 		props.dispatch(doAutoAuth());
-	}, []);
+		const unsubscribe = props.navigation.addListener('focus', () => {
+			props.dispatch(doAutoAuth());
+		});
+
+		return unsubscribe;
+	}, [props.navigation]);
 	
 	useEffect(() => {
 		if(props.autoLoginTo !== 'AutoLogin'){
@@ -27,7 +32,7 @@ const AutoLogin = (props) => {
 	  <ScrollView>
 		<View style={{marginHorizontal: 10}}>
 		 <View style={[styles.container, styles.horizontal]}>
-			{props.autoAuthError === null ? (<ActivityIndicator size="large"  color="#0000ff" />) : (<Text>{props.autoAuthError}</Text>)}
+			{props.tryingAutoAuth ? (<ActivityIndicator size="large"  color="#0000ff" />) : (<Text>{props.autoAuthError}</Text>)}
 		</View>
 		{props.autoAuthError ? (<Button
 		  title="Press to re-try"

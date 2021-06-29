@@ -64,7 +64,8 @@ export default function auth (state = initialState, action) {
 	case SET_AUTO_AUTH_ERROR:
 		return {
 			...state,
-			autoAuthError: action.message
+			autoAuthError: action.message,
+			tryingAutoAuth: false
 		}
 	break;
 	case AUTO_LOGIN_TO:

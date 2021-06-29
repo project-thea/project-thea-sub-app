@@ -114,7 +114,7 @@ export function doAutoAuth(){
 			
 			//Confirm token is still valid 
 			if (res.err) {
-				dispatch(setAutoAuthError('Authenticating Error. Login again'));
+				dispatch(setAutoAuthError('Failed to uuthenticate. Check network connectivity'));
 				dispatch(autoLoginTo('Login'));
 				return;
 			}
