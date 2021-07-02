@@ -57,6 +57,7 @@ const Login = (props) => {
 			/>
 		  }
 		  onChangeText={(value) => setPassword(value)}
+		  secureTextEntry={true}
 		/>
 
 		<Button
