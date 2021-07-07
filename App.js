@@ -38,7 +38,6 @@ import TestDetails from './src/screens/TestDetails';
 import Info from './src/screens/Info';
 import Settings from './src/screens/Settings';
 import Register from './src/screens/Register';
-import AutoLogin from './src/screens/AutoLogin';
 
 const AppNavigator = createStackNavigator({
 	Login: {
@@ -68,16 +67,10 @@ const AppNavigator = createStackNavigator({
 	},
 	Register: {
 		screen: Register
-	},
-	AutoLogin: {
-		screen: AutoLogin,
-		navigationOptions: {
-			headerShown: false,
-		}
 	}
 },
 {
-    initialRouteName: 'AutoLogin',
+    initialRouteName: 'Login',
 });
 
 const AppContainer = createAppContainer(AppNavigator);

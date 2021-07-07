@@ -15,21 +15,32 @@ import Colors from '../shared/Colors';
 import Footer from '../shared/Footer';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import { startTracking, stopTracking } from '../actions/TrackingActions';
-
+import { getFrisbee } from '../Constants';
+ import { DateTime } from "luxon";
+ 
 const Pulse = require('react-native-pulse').default;
 let width = Dimensions.get('window').width;
 
 const Track = (props) => {
   const [tracking, setTracking] = useState(false);
   
+  const api =  getFrisbee(null, props.uploadURL);
+  
   useEffect(() => {
 	  configBgLocation();
 	  
 	  return () => {
-		  //@TODO: Clean up
+		  //endTracking()
 	  }
   });
   
+
+   //@TODO: Check if for some reason the background task is still running. 
+   //Showing the animated tracking indicator if this is the case.
+  
+  /**
+  * Configure sampling task
+  */
   const configBgLocation = () => {
 	BackgroundGeolocation.configure({
 	  desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
@@ -37,7 +48,7 @@ const Track = (props) => {
 	  distanceFilter: 50,
 	  notificationTitle: 'THEA-C19',
 	  notificationText: 'Collecting GPS location...',
-	  debug: false,
+	  debug: true,
 	  startOnBoot: false,
 	  stopOnTerminate: true,
 	  locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
@@ -45,25 +56,39 @@ const Track = (props) => {
 	  fastestInterval: 5000,
 	  activitiesInterval: 10000,
 	  stopOnStillActivity: false,
-	  url: props.uploadURL,
-	  httpHeaders: {
-		'Authorization': `Bearer ${props.accessToken}`,
-	  },
+	  url: null, //props.uploadURL,
+	  //httpHeaders: {
+		//'Authorization': `Bearer ${props.accessToken}`,
+	  //},
 	  // customize post properties
-	  postTemplate: {
-		latitude: '@latitude',
-		longitude: '@longitude',
-		subject_id: props.user_id,
-		date_time: '@time',
-		unique_id: ''
-	  }
+	  //postTemplate: {
+		//latitude: '@latitude',
+		//longitude: '@longitude',
+		//subject_id: props.user_id,
+		//date_time: '@time',
+		//unique_id: ''
+	  //}
 	});
 	
-	BackgroundGeolocation.on('location', (location) => {
+	BackgroundGeolocation.on('location', async (location) => {
 	  // handle your locations here
 	  // to perform long running operation on iOS
 	  // you need to create background task
 	  console.log('locatoin:', location);
+	  
+	  const response = await api.post(props.uploadULR, {
+		  body: {
+			  latitude: location.latitude,
+			  longitude: location.longitude,
+			  subject_id: props.user_id,
+			  date_time: DateTime.fromMillis(location.time).toFormat('yyyy-LL-dd HH:mm:ss'),
+			  unique_id: props.userDetails.unique_id
+		  }
+	  });
+	  
+	  console.log('START++++++++++++++++++++++++++++++++++++++++=');
+	  console.log(response);
+	  console.log('END++++++++++++++++++++++++++++++++++++++++=');
 	  
 	  BackgroundGeolocation.startTask(taskKey => {
 		// execute long running task
@@ -240,13 +265,12 @@ const styles = StyleSheet.create({
 });
 
 function mapStateToProps(state) {
-	const user_id = state.auth.userDetails ? state.auth.userDetails.id : 0;
+	const user_id = state.auth.userDetails.id ? state.auth.userDetails.id : 0;
 	return { 
-		//uuid: state.auth.uuid,
 		uploadURL: state.settings.uploadURL,
 		tracking: state.track.tracking,
 		user_id: user_id,
-		accessToken: state.auth.token
+		userDetails: state.auth.userDetails
 	}
 }
 

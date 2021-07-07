@@ -9,12 +9,11 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
-import { authUser } from '../actions/AuthActions';
+import { registerSujbect } from '../actions/AuthActions';
 import { useFocusEffect }  from 'react-navigation';
 
 const Login = (props) => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+	const [phone, setPhone] = useState('');
 	
 	useEffect(() => {
 		if(props.userDetails !== undefined && props.userDetails !== null){
@@ -33,42 +32,30 @@ const Login = (props) => {
 		  </View>
 		</View>
 		
-		{props.authError ? (<View style={styles.authError}><Text>{props.authError}</Text></View>) : null}
+		{props.registrationError ? (<View style={styles.registrationError}><Text>{props.registrationError}</Text></View>) : null}
 		
+		<View style={{marginTop: '40%'}}></View>
 		<Input
-		  placeholder='Enter email'
+		  placeholder='Phone Number'
 		  leftIcon={
 			<Icon
-			  name='at'
+			  name='phone'
 			  size={24}
 			  color='black'
 			/>
 		  }
-		  onChangeText={(value) => setEmail(value)}
+		  onChangeText={(value) => setPhone(value)}
 		/>
-
-		<Input
-		  placeholder='Enter password'
-		  leftIcon={
-			<Icon
-			  name='key'
-			  size={24}
-			  color='black'
-			/>
-		  }
-		  onChangeText={(value) => setPassword(value)}
-		  secureTextEntry={true}
-		/>
-
+		
 		<Button
-		  title="Login"
+		  title="Use Anonymously"
 		  containerStyle={{
 			  marginHorizontal: 10
 		  }}
 		  onPress={() => { 
-			props.dispatch(authUser(email, password))
+			props.dispatch(registerSujbect({phone}))
 		  }}
-		  loading={props.authenticating}
+		  loading={props.registeringSubject}
 		/>
 
 
@@ -83,24 +70,6 @@ const Login = (props) => {
 		  }}
 		  type="outline"
 		/>
-		
-		<View style={{marginHorizontal: 10}}>
-	      <Icon
-	        name='angle-right'
-	        size={24}
-	        color='black'
-	      />
-	      <Text>Log in anonymously?</Text>
-		</View>
-		
-		<View style={{marginHorizontal: 10}}>
-	      <Icon
-	        name='angle-right'
-	        size={24}
-	        color='black'
-	      />
-	      <Text>Forgot password?</Text>
-		</View>
 		
 	   </ScrollView>
 	);
@@ -124,7 +93,7 @@ const Login = (props) => {
 		 marginTop: 10,
 		 flex: 1
 	 },
-	 authError: {
+	 registrationError: {
 		 backgroundColor: 'red',
 		 color: '#ffffff'
 	 }
@@ -132,9 +101,9 @@ const Login = (props) => {
  
 function mapStateToProps(state) {
 	return { 
-		authenticating: state.auth.authenticating,
-		authError: state.auth.authError,
-		userDetails: state.auth.userDetails
+		registrationError: state.auth.registrationError,
+		userDetails: state.auth.userDetails,
+		registeringSubject: state.auth.registeringSubject
 	}
 }
 

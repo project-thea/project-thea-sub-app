@@ -6,7 +6,10 @@ import {
 	SET_TOKEN,
 	TRY_AUTO_AUTH,
 	SET_AUTO_AUTH_ERROR,
-	AUTO_LOGIN_TO
+	AUTO_LOGIN_TO,
+	LOGIN,
+	SET_REGISTRATION_ERROR,
+	REGISTER_SUBJECT
  } from '../actions/AuthActions';
 
 const initialState = {
@@ -15,14 +18,34 @@ const initialState = {
 	authError: null,
 	userDetails: null,
 	
+	loggingIn: false,
+	
 	//Auto sign in
 	tryingAutoAuth: false,
 	autoAuthError: null,
-	autoLoginTo: 'AutoLogin' //AutoLogin,Login,Track
+	autoLoginTo: 'AutoLogin', //AutoLogin,Login,Track
+	
+	//Anonymous registration
+	registeringSubject: false,
+	registrationError: null
 };
 
 export default function auth (state = initialState, action) {
   switch (action.type) {
+	case REGISTER_SUBJECT:
+		return {
+			...state,
+			registeringSubject: true,
+			registrationError: null
+		}
+	break;
+	case SET_REGISTRATION_ERROR:
+		return {
+			...state,
+			registeringSubject: false,
+				registrationError: action.message
+		}
+	break;
 	case SEND_AUTH_DETAILS:
 		return {
 			...state,
@@ -72,6 +95,12 @@ export default function auth (state = initialState, action) {
 		return {
 			...state,
 			autoLoginTo: action.screen
+		}
+	break;
+	case LOGIN:
+		return {
+			...state,
+			loggingIn: true
 		}
 	break;
     default:

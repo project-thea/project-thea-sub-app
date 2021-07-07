@@ -12,82 +12,93 @@ import { Input, Button } from 'react-native-elements';
 import { sendAuthDetails } from '../actions/AuthActions';
 
 const Register = (props) => {
-	
-	return	(
-	  <ScrollView>
-		
-		{props.authError ? (<View>{props.authError}</View>) : null}
-		
-		<Input
-		  placeholder='email'
-		  leftIcon={
-			<Icon
-			  name='at'
-			  size={24}
-			  color='black'
-			/>
-		  }
-		/>
-
-		<Input
-		  placeholder='First Name'
-		  leftIcon={
-			<Icon
-			  name='key'
-			  size={24}
-			  color='black'
-			/>
-		  }
-		/>
-
-		<Input
-		  placeholder='Last time'
-		  leftIcon={
-			<Icon
-			  name='key'
-			  size={24}
-			  color='black'
-			/>
-		  }
-		/>
-
-		<Input
-		  placeholder='Other names'
-		  leftIcon={
-			<Icon
-			  name='key'
-			  size={24}
-			  color='black'
-			/>
-		  }
-		/>
-		
-		<Button
-		  title="Login"
-		  containerStyle={{
-			  marginHorizontal: 10
-		  }}
-		  onPress={() => { 
-			props.navigation.navigate('Track');
-			//props.dispatch(sendAuthDetails())
-		  }}
-		  loading={props.authenticating}
-		/>
-
-
-		<View style={{marginHorizontal: 10}}>
-			<Icon
-			  name='angle-right'
-			  size={24}
-			  color='black'
-			/>
-			<Text>Back to login</Text>
-		</View>
-		
-		
-	   </ScrollView>
-	);
-
+  
+  return	(
+    <ScrollView>
+  	
+  	{props.authError ? (<View>{props.authError}</View>) : null}
+  	
+  	<Input
+  	  placeholder='email'
+  	  leftIcon={
+  		<Icon
+  		  name='at'
+  		  size={24}
+  		  color='black'
+  		/>
+  	  }
+  	/>
+  
+  	<Input
+  	  placeholder='First Name'
+  	  leftIcon={
+  		<Icon
+  		  name='key'
+  		  size={24}
+  		  color='black'
+  		/>
+  	  }
+  	/>
+  
+  	<Input
+  	  placeholder='Last time'
+  	  leftIcon={
+  		<Icon
+  		  name='key'
+  		  size={24}
+  		  color='black'
+  		/>
+  	  }
+  	/>
+  
+  	<Input
+  	  placeholder='Other names'
+  	  leftIcon={
+  		<Icon
+  		  name='key'
+  		  size={24}
+  		  color='black'
+  		/>
+  	  }
+  	/>
+  	
+  	<Input
+  	  placeholder='Phone'
+  	  leftIcon={
+  		<Icon
+  		  name='phone'
+  		  size={24}
+  		  color='black'
+  		/>
+  	  }
+  	/>
+  	
+  	<Button
+  	  title="Register"
+  	  containerStyle={{
+  		  marginHorizontal: 10
+  	  }}
+  	  onPress={() => { 
+  		props.navigation.navigate('Track');
+  		//props.dispatch(sendAuthDetails())
+  	  }}
+  	  loading={props.authenticating}
+  	/>
+  
+  
+  	<View style={{marginHorizontal: 10}}>
+  		<Icon
+  		  name='angle-right'
+  		  size={24}
+  		  color='black'
+  		/>
+  		<Text onPress={() => props.navigation.navigate('Login')}>Back to login</Text>
+  	</View>
+  	
+  	
+     </ScrollView>
+  );
+  
 }
   
   

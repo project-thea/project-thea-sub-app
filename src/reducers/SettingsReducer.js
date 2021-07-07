@@ -1,9 +1,10 @@
 import {
 	UPDATE_UPLOADURL
 } from '../actions/SettingsActions';
+import { API_BASE_URL } from '../Constants';
 
 const initialState = {
-	uploadURL: 'https://demo.project-thea.org'
+	uploadURL: API_BASE_URL + '/api/tracking/subject/anon'
 }
 
 export default function settings (state = initialState, action) {
