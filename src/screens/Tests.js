@@ -7,60 +7,71 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions
+  RefreshControl,
+  FlatList
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, ListItem } from 'react-native-elements';
 import Colors from '../shared/Colors';
 import Footer from '../shared/Footer';
+import { getTests } from '../actions/TestActions';
+import { DateTime } from "luxon";
 
 const Tests = (props) => {
+    
+	const now = DateTime.fromISO(new Date());
+	
+	useEffect(() => {
+		refreshTests();
+	}, []);
 
-
+	const refreshTests = () => {
+		if(!props.fetchingTests){
+			props.dispatch(getTests());
+		}
+	}
+	
 	return (
-	<View style={{flex: 1}}>
-		<ScrollView>
+	<SafeAreaView style={{flex: 1}}>
+		<ScrollView
+			refreshControl={
+			  <RefreshControl
+				refreshing={props.fetchingTests}
+				onRefresh={() => refreshTests()}
+			  />
+			}
+		>
 		<View style={{marginHorizontal: 10, marginTop: 10}}>
 			
-			<ListItem key="0" bottomDivider  onPress={() => props.navigation.navigate('TestDetails')}>
-				<ListItem.Content>
-				  <ListItem.Title>NEGATIVE</ListItem.Title>
-				  <ListItem.Subtitle>Test done on 20/04/2021</ListItem.Subtitle>
-				</ListItem.Content>
-				<ListItem.Chevron />
-			</ListItem>
-			<ListItem key="1" bottomDivider onPress={() => props.navigation.navigate('TestDetails')}>
-				<ListItem.Content>
-				  <ListItem.Title>NEGATIVE</ListItem.Title>
-				  <ListItem.Subtitle>Test done on 20/04/2021</ListItem.Subtitle>
-				</ListItem.Content>
-				<ListItem.Chevron/>
-			</ListItem>
-			<ListItem key="2" bottomDivider onPress={() => props.navigation.navigate('TestDetails')}>
-				<ListItem.Content>
-				  <ListItem.Title>NEGATIVE</ListItem.Title>
-				  <ListItem.Subtitle>Test done on 20/04/2021</ListItem.Subtitle>
-				</ListItem.Content>
-				<ListItem.Chevron />
-			</ListItem>
-			<ListItem key="3" bottomDivider onPress={() => props.navigation.navigate('TestDetails')}>
-				<ListItem.Content>
-				  <ListItem.Title>POSITIVE</ListItem.Title>
-				  <ListItem.Subtitle>Test done on 20/04/2021</ListItem.Subtitle>
-				</ListItem.Content>
-				<ListItem.Chevron />
-			</ListItem>
-	  
+			
+			{props.tests.map( (v, i) => {
+				const testDate = DateTime.fromISO(v.created_at);
+				const dateDiff = now.diff(testDate, ['days']);
+				return (
+				<ListItem key="3" bottomDivider onPress={() => props.navigation.navigate('TestDetails', {index: i} )}>
+					<ListItem.Content>
+					  <ListItem.Title>{v.status}</ListItem.Title>
+					  <ListItem.Subtitle>Test done on {DateTime.fromISO(v.created_at).toFormat('yyyy-LL-dd HH:mm:ss')}</ListItem.Subtitle>
+					</ListItem.Content>
+					<ListItem.Chevron />
+				</ListItem>
+			);})}
+	  	
 		</View>
 		</ScrollView>
+		<View>
+			{props.tests.length > 0 ? null : (<Text>You have 0 tests. Swipe down to refresh.</Text>)}
+		</View>
 		<Footer/>
-	</View>
+	</SafeAreaView>
 	);
 }
 
 function mapStateToProps(state) {
 	return { 
-
+		tests: state.tests.tests,
+		fetchingTests: state.tests.fetchingTests,
+		fetchingTestsError: state.tests.fetchingTestsError
 	}
 }
 

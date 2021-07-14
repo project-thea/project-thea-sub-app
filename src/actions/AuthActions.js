@@ -11,6 +11,11 @@ export const SET_TOKEN = 'SET_TOKEN';
 export const TRY_AUTO_AUTH = 'TRY_AUTO_AUTH';
 export const SET_AUTO_AUTH_ERROR = 'SET_AUTO_AUTH_ERROR';
 export const AUTO_LOGIN_TO = 'AUTO_LOGIN_TO';
+export const START_DELETE_SUBJECT = 'START_DELETE_SUBJECT';
+export const START_UPDATE_SUBJECT = 'START_UPDATE_SUBJECT';
+export const SET_UPDATE_SUBJECT_ERROR = 'SET_UPDATE_SUBJECT_ERROR';
+export const SET_DELETE_SUBJECT_ERROR = 'SET_DELETE_SUBJECT_ERROR';
+
 
 /*
 * Register anonymous subject
@@ -20,6 +25,38 @@ export const SET_REGISTRATION_ERROR  = 'SET_REGISTRATION_ERROR';
 export const REGISTER_SUBJECT = 'REGISTER_SUBJECT';
 
 export const LOGIN = 'LOGIN';
+
+export function setUpdateSubjectError(message){
+  return {
+	type: SET_UPDATE_SUBJECT_ERROR,
+	message
+  }	
+}
+
+export function setDeleteSubjectError(message){
+  return {
+	type: SET_DELETE_SUBJECT_ERROR,
+	message
+  }	
+}
+
+/**
+* Marks start of the update process
+*/
+export function startUpdateSubject(){
+	return {
+		type: START_UPDATE_SUBJECT
+	}
+}
+
+/**
+* Mark start of the delete subject process 
+*/
+export function startDeleteSubject(){
+	return {
+		type: START_DELETE_SUBJECT
+	}
+}
 
 export function login(){
 	return {
@@ -182,7 +219,7 @@ export function doAutoAuth(){
 }
 
 
-export function registerSujbect({phone, first_name, last_name, email, nationality, date_of_birth, next_of_kin, next_of_kin_phone, id_number, id_type}){
+export function registerSujbect({phone, firstname, lastname, email, nationality, dateOfBirth, nextOfKin, nextOfKinPhone, idNumber, idType}){
   return async (dispatch, getState) => {
   	dispatch(registeringSubject());
   	
@@ -193,18 +230,18 @@ export function registerSujbect({phone, first_name, last_name, email, nationalit
   	  	body: {
   	  		phone,
 			unique_id,
-  	  		first_name: first_name ? first_name : 'Anonymous',
-			last_name: last_name ? last_name: 'Anonymous',
+  	  		first_name: firstname ? firstname : 'Anonymous',
+			last_name: lastname ? lastname: 'Anonymous',
 			email: email ? email : unique_id + '@project-thea.org',
 			nationality: nationality ? nationality : 'Anonymous',
-			date_of_birth: date_of_birth ? date_of_birth : '1971-01-01',
-			next_of_kin: next_of_kin ? next_of_kin : 'Anonymous',
-			next_of_kin_phone: next_of_kin_phone ? next_of_kin_phone : '0123456789',
-			id_number: id_number ? id_number : unique_id,
-			id_type: id_type ? id_type : 'unique_id'
+			date_of_birth: dateOfBirth ? dateOfBirth : '1971-01-01',
+			next_of_kin: nextOfKin ? nextOfKin : 'Anonymous',
+			next_of_kin_phone: nextOfKinPhone ? nextOfKinPhone : '0123456789',
+			id_number: idNumber ? idNumber : unique_id,
+			id_type: idType ? idType : 'unique_id'
   	  	}
   	  });
-      console.log(res);
+
   	  if (res.err) {
   	  	dispatch(setRegistrationError('Error Registering. Try again!'));
   	  	return;
@@ -218,4 +255,65 @@ export function registerSujbect({phone, first_name, last_name, email, nationalit
   	}
   			
   };
+}
+
+export function updateSubject({phone, firstname, lastname, email, nationality, dateOfBirth, nextOfKin, nextOfKinPhone, idNumber, idType}){
+  return async (dispatch, getState) => {
+	dispatch(startUpdateSubject());
+	  
+	try {
+	  const uniqueId  = getState().auth.userDetails.unique_id;
+	  const userId  = getState().auth.userDetails.id;
+  	  const api = getFrisbee();
+  	  const res  = await api.post('/api/subjects/anon/' + userId, {
+  	    body: {
+  	      phone,
+	      unique_id: uniqueId,
+  	      first_name: firstname,
+	      last_name: lastname,
+	      email,
+	      nationality,
+	      date_of_birth: dateOfBirth,
+	      next_of_kin: nextOfKin,
+	      next_of_kin_phone: nextOfKinPhone,
+	      id_number: idNumber,
+	      id_type: idType
+  	    }
+  	  });
+	  
+  	  if (res.err) {
+  	  	dispatch(setUpdateSubjectError('Error Registering. Try again!'));
+  	  	return;
+  	  }
+	  
+  	  await AsyncStorage.setItem('userDetails',  JSON.stringify(res.body.data));
+  	  
+  	  dispatch(saveUserDetails(res.body.data));
+	}catch(e){
+	  dispatch(setUpdateSubjectError('Error updating information. Check network connectivity!'));
+	}
+  }
+}
+
+/*
+* Delete subject account details
+*/
+export function deleteSubject(){
+  return async (dispatch, getState) => {
+	dipatch(startDeleteSubject());
+		
+	try{
+	  const userId  = getState().auth.userDetails.id;
+  	  const api = getFrisbee();
+	  const res  = await api.delete('/api/subjects/anon/' + userId);
+	
+  	  if (res.err) {
+  	  	dispatch(setDeleteSubjectError('Error deleting information. Try again!'));
+  	  	return;
+  	  }
+	  
+	}catch(e){
+	  dispatch(setDeleteSubjectError('Error deleting information. Check network connectivity!'));
+	}
+  }
 }

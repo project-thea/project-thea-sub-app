@@ -9,7 +9,12 @@ import {
 	AUTO_LOGIN_TO,
 	LOGIN,
 	SET_REGISTRATION_ERROR,
-	REGISTER_SUBJECT
+	REGISTER_SUBJECT,
+	
+	START_UPDATE_SUBJECT,
+	START_DELETE_SUBJECT,
+	SET_UPDATE_SUBJECT_ERROR,
+	SET_DELETE_SUBJECT_ERROR
  } from '../actions/AuthActions';
 
 const initialState = {
@@ -27,11 +32,43 @@ const initialState = {
 	
 	//Anonymous registration
 	registeringSubject: false,
-	registrationError: null
+	registrationError: null,
+	
+	updatingSubject: false,
+	deletingSubject: false,
+	updateSubjectError: null,
+	deletingSubjectError: null
+	
 };
 
 export default function auth (state = initialState, action) {
   switch (action.type) {
+	case SET_UPDATE_SUBJECT_ERROR:
+		return {
+			...state,
+			updateSubjectError: action.message,
+			updatingSubject: false
+		}
+	break;
+	case SET_DELETE_SUBJECT_ERROR:
+		return {
+			...state,
+			deleteSubjectError: action.message,
+			deletingSubject: false
+		}
+	break;
+	case START_UPDATE_SUBJECT:
+		return {
+			...state,
+			updatingSubject: true		
+		}
+	break;
+	case START_DELETE_SUBJECT:
+	  return {
+	    ...state,
+        deletingSubject: true		
+      }
+	break;
 	case REGISTER_SUBJECT:
 		return {
 			...state,

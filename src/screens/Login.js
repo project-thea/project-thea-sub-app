@@ -5,11 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  Text
+  Text,
+  Alert 
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
-import { registerSujbect } from '../actions/AuthActions';
+import { registerSujbect, setRegistrationError } from '../actions/AuthActions';
 import { useFocusEffect }  from 'react-navigation';
 
 const Login = (props) => {
@@ -53,7 +54,11 @@ const Login = (props) => {
 			  marginHorizontal: 10
 		  }}
 		  onPress={() => { 
-			props.dispatch(registerSujbect({phone}))
+		    if(new RegExp('[0-9]{7,}').test(phone)){
+			  props.dispatch(registerSujbect({phone}));			
+		    }else{
+			  Alert.alert("Error", "Please provide atleast  7 digits for the phone number");
+		    }
 		  }}
 		  loading={props.registeringSubject}
 		/>

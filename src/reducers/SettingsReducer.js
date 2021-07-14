@@ -4,7 +4,7 @@ import {
 import { API_BASE_URL } from '../Constants';
 
 const initialState = {
-	uploadURL: API_BASE_URL + '/api/tracking/subject/anon'
+	uploadURL: 'https://demo.project-thea.org'
 }
 
 export default function settings (state = initialState, action) {

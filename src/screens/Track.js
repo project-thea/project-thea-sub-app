@@ -16,7 +16,7 @@ import Footer from '../shared/Footer';
 import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import { startTracking, stopTracking } from '../actions/TrackingActions';
 import { getFrisbee } from '../Constants';
- import { DateTime } from "luxon";
+import { DateTime } from "luxon";
  
 const Pulse = require('react-native-pulse').default;
 let width = Dimensions.get('window').width;
@@ -85,10 +85,6 @@ const Track = (props) => {
 			  unique_id: props.userDetails.unique_id
 		  }
 	  });
-	  
-	  console.log('START++++++++++++++++++++++++++++++++++++++++=');
-	  console.log(response);
-	  console.log('END++++++++++++++++++++++++++++++++++++++++=');
 	  
 	  BackgroundGeolocation.startTask(taskKey => {
 		// execute long running task
