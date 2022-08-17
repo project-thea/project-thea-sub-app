@@ -29,7 +29,6 @@ const Login = (props) => {
 		  	<Text style={styles.appTitle}>THEA-C19</Text>
 		  </View>
 		  <View>
-		  	<Text style={styles.appSubtitle}>Subject App</Text>
 		  </View>
 		</View>
 		

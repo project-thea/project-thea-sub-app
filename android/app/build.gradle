@@ -131,7 +131,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.projecttheasubapp"
+        applicationId "com.projectthea.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
