@@ -48,18 +48,21 @@ class Footer extends React.Component {
 				</TouchableOpacity>
 				<Text>Tests</Text>
 			</View>
-			<View style={styles.iconContainer}>
-				<TouchableOpacity
-					onPress={() => this.props.navigation.navigate('Info')}
-				>
-					<Icon 
-						name="info" 
-						type='font-awesome-5' 
-						size={30} 
-						color={Colors.primary} />
-				</TouchableOpacity>
-				<Text>Info</Text>
-			</View>
+			
+			{
+			//<View style={styles.iconContainer}>
+			//	<TouchableOpacity
+			//		onPress={() => this.props.navigation.navigate('Info')}
+			//	>
+			//		<Icon 
+			//			name="info" 
+			//			type='font-awesome-5' 
+			//			size={30} 
+			//			color={Colors.primary} />
+			//	</TouchableOpacity>
+			//	<Text>Info</Text>
+			//</View>
+			}
 			<View style={styles.iconContainer}>
 				<TouchableOpacity
 					onPress={() => this.props.navigation.navigate('Settings')}

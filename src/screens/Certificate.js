@@ -34,7 +34,7 @@ const Certificate = (props) => {
 		return 'grey';
 	}
 
-	const testDate = DateTime.fromISO(props.recentTest.created_at);
+	const testDate = props.recentTest ? DateTime.fromISO(props.recentTest.created_at) : null;
 	
 	return (
 	<View style={{flex: 1}}>

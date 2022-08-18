@@ -242,7 +242,6 @@ export function registerSujbect({phone, firstname, lastname, email, nationality,
   	  	}
   	  });
 
-	  console.log('+++++++++++++++++++++++++++++++');
       console.log(res);
   	  if (res.err) {
   	  	dispatch(setRegistrationError('Error Registering. Try again!'));
@@ -253,7 +252,6 @@ export function registerSujbect({phone, firstname, lastname, email, nationality,
   	  
   	  dispatch(saveUserDetails(res.body.data));
   	}catch(e){
-	  console.log('00000000000000000000000000000000000');
 	  console.log(e);
 	  dispatch(setRegistrationError('Error Registering. Check network connectivity!'));
   	}

@@ -26,13 +26,21 @@ const Login = (props) => {
 	  <ScrollView>
 		<View style={styles.appTitleContainer}>
 		  <View>
-		  	<Text style={styles.appTitle}>THEA-C19</Text>
+		  	<Text style={styles.appTitle}>THEA-GS</Text>
 		  </View>
 		  <View>
 		  </View>
 		</View>
 		
-		{props.registrationError ? (<View style={styles.registrationError}><Text>{props.registrationError}</Text></View>) : null}
+		{props.registrationError ? (
+		<View style={{...styles.registrationError, flexDirection: 'row'}}>
+			<View style={{flex: 1}}>
+			  <Icon name="exclamation-triangle" size={28}/>
+			</View>
+			<View style={{flex: 8}}>
+			  <Text style={{color: '#721c24', fontSize: 16}}>{props.registrationError}</Text>
+			</View>
+		</View>) : null}
 		
 		<View style={{marginTop: '40%'}}></View>
 		<Input
@@ -48,7 +56,7 @@ const Login = (props) => {
 		/>
 		
 		<Button
-		  title="Use Anonymously"
+		  title="Enroll"
 		  containerStyle={{
 			  marginHorizontal: 10
 		  }}
@@ -63,18 +71,19 @@ const Login = (props) => {
 		/>
 
 
-		<Button
-		  title="Register"
-		  containerStyle={{
-			  marginHorizontal: 10,
-			  marginTop: 10
-		  }}
-		  onPress={() => { 
-			props.navigation.navigate('Register');
-		  }}
-		  type="outline"
-		/>
-		
+		{
+		//<Button
+		//  title="Register"
+		//  containerStyle={{
+		//	  marginHorizontal: 10,
+		//	  marginTop: 10
+		//  }}
+		//  onPress={() => { 
+		//	props.navigation.navigate('Register');
+		//  }}
+		//  type="outline"
+		///>
+		}
 	   </ScrollView>
 	);
 
@@ -98,8 +107,10 @@ const Login = (props) => {
 		 flex: 1
 	 },
 	 registrationError: {
-		 backgroundColor: 'red',
-		 color: '#ffffff'
+		 backgroundColor: '#f8d7da',
+		 color: '#fff',
+		 marginHorizontal: 10,
+		 padding: 10
 	 }
  });
  

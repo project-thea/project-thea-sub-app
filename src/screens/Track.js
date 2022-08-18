@@ -238,11 +238,13 @@ const Track = (props) => {
   const beginTracking = () => {
 		getLocationUpdates();
 		//setTracking(true);
+		props.dispatch(startTracking());
 	}
 	
   const endTracking = () => {
   	removeLocationUpdates();
 	//setTracking(false);
+	props.dispatch(stopTracking());
   }
 	
 	const toggleTracking = () => {
