@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { connect } from 'react-redux';
 import {
   SafeAreaView,
@@ -7,165 +7,242 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  Platform,
+  ToastAndroid,
+  PermissionsAndroid,
+  Linking
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button } from 'react-native-elements';
 import Colors from '../shared/Colors';
 import Footer from '../shared/Footer';
-import BackgroundGeolocation from '@mauron85/react-native-background-geolocation';
 import { startTracking, stopTracking } from '../actions/TrackingActions';
 import { getFrisbee } from '../Constants';
 import { DateTime } from "luxon";
- 
+import Geolocation from 'react-native-geolocation-service';
+import VIForegroundService from '@voximplant/react-native-foreground-service';
+
 const Pulse = require('react-native-pulse').default;
 let width = Dimensions.get('window').width;
 
 const Track = (props) => {
   const [tracking, setTracking] = useState(false);
   
-  const api =  getFrisbee(null, props.uploadURL);
+  //const foregroundServiceInst = VIForegroundService.getInstance();
   
+  //---------------------------------------------
+  const [forceLocation, setForceLocation] = useState(true);
+  const [highAccuracy, setHighAccuracy] = useState(true);
+  const [locationDialog, setLocationDialog] = useState(true);
+  const [significantChanges, setSignificantChanges] = useState(false);
+  const [observing, setObserving] = useState(false);
+  const [foregroundService, setForegroundService] = useState(true);
+  const [useLocationManager, setUseLocationManager] = useState(false);
+  const [location, setLocation] = useState(null);
+
+  const watchId = useRef(null);
+
   useEffect(() => {
-	  configBgLocation();
-	  
-	  return () => {
-		  //endTracking()
+    return () => {
+      removeLocationUpdates();
+    };
+  }, [removeLocationUpdates]);
+
+  const hasPermissionIOS = async () => {
+    const openSetting = () => {
+      Linking.openSettings().catch(() => {
+        Alert.alert('Unable to open settings');
+      });
+    };
+    const status = await Geolocation.requestAuthorization('whenInUse');
+
+    if (status === 'granted') {
+      return true;
+    }
+
+    if (status === 'denied') {
+      Alert.alert('Location permission denied');
+    }
+
+    if (status === 'disabled') {
+      Alert.alert(
+        `Turn on Location Services to allow "${appConfig.displayName}" to determine your location.`,
+        '',
+        [
+          { text: 'Go to Settings', onPress: openSetting },
+          { text: "Don't Use Location", onPress: () => {} },
+        ],
+      );
+    }
+
+    return false;
+  };
+
+  const hasLocationPermission = async () => {
+    if (Platform.OS === 'ios') {
+      const hasPermission = await hasPermissionIOS();
+      return hasPermission;
+    }
+
+    if (Platform.OS === 'android' && Platform.Version < 23) {
+      return true;
+    }
+
+    const hasPermission = await PermissionsAndroid.check(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+    );
+
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+	  {
+		title: 'Requesting tracking permissions',
+		message: 'This app will track your movement as you move'
 	  }
-  });
-  
+    );
 
-   //@TODO: Check if for some reason the background task is still running. 
-   //Showing the animated tracking indicator if this is the case.
-  
-  /**
-  * Configure sampling task
-  */
-  const configBgLocation = () => {
-	BackgroundGeolocation.configure({
-	  desiredAccuracy: BackgroundGeolocation.HIGH_ACCURACY,
-	  stationaryRadius: 50,
-	  distanceFilter: 50,
-	  notificationTitle: 'THEA-C19',
-	  notificationText: 'Collecting GPS location...',
-	  debug: true,
-	  startOnBoot: false,
-	  stopOnTerminate: true,
-	  locationProvider: BackgroundGeolocation.ACTIVITY_PROVIDER,
-	  interval: 10000,
-	  fastestInterval: 5000,
-	  activitiesInterval: 10000,
-	  stopOnStillActivity: false,
-	  url: null, //props.uploadURL,
-	  //httpHeaders: {
-		//'Authorization': `Bearer ${props.accessToken}`,
-	  //},
-	  // customize post properties
-	  //postTemplate: {
-		//latitude: '@latitude',
-		//longitude: '@longitude',
-		//subject_id: props.user_id,
-		//date_time: '@time',
-		//unique_id: ''
-	  //}
-	});
+	console.log('status:', status);
+	;
 	
-	BackgroundGeolocation.on('location', async (location) => {
-	  // handle your locations here
-	  // to perform long running operation on iOS
-	  // you need to create background task
-	  console.log('locatoin:', location);
-	  
-	  const response = await api.post(props.uploadULR, {
-		  body: {
-			  latitude: location.latitude,
-			  longitude: location.longitude,
-			  subject_id: props.user_id,
-			  date_time: DateTime.fromMillis(location.time).toFormat('yyyy-LL-dd HH:mm:ss'),
-			  unique_id: props.userDetails.unique_id
-		  }
-	  });
-	  
-	  BackgroundGeolocation.startTask(taskKey => {
-		// execute long running task
-		// eg. ajax post location
-		// IMPORTANT: task has to be ended by endTask
-		BackgroundGeolocation.endTask(taskKey);
-	  });
-	});
-	
-    BackgroundGeolocation.on('stationary', (stationaryLocation) => {
-      // handle stationary locations here
-      Actions.sendLocation(stationaryLocation);
-    });
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+    
+	console.log('PermissionsAndroid:', PermissionsAndroid);
+	;
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+      ToastAndroid.show(
+        'Location permission denied by user.',
+        ToastAndroid.LONG,
+      );
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      ToastAndroid.show(
+        'Location permission revoked by user.',
+        ToastAndroid.LONG,
+      );
+    }
 
-    BackgroundGeolocation.on('error', (error) => {
-      console.log('[ERROR] BackgroundGeolocation error:', error);
-    });
+    return false;
+  };
 
-    BackgroundGeolocation.on('start', () => {
-      console.log('[INFO] BackgroundGeolocation service has been started');
-    });
+  const getLocation = async () => {
+    const hasPermission = await hasLocationPermission();
 
-    BackgroundGeolocation.on('stop', () => {
-      console.log('[INFO] BackgroundGeolocation service has been stopped');
-    });
+    if (!hasPermission) {
+      return;
+    }
 
-    BackgroundGeolocation.on('authorization', (status) => {
-      console.log('[INFO] BackgroundGeolocation authorization status: ' + status);
-      if (status !== BackgroundGeolocation.AUTHORIZED) {
-        // we need to set delay or otherwise alert may not be shown
-        setTimeout(() =>
-          Alert.alert('App requires location tracking permission', 'Would you like to open app settings?', [
-            { text: 'Yes', onPress: () => BackgroundGeolocation.showAppSettings() },
-            { text: 'No', onPress: () => console.log('No Pressed'), style: 'cancel' }
-          ]), 1000);
-      }
-    });
+    Geolocation.getCurrentPosition(
+      (position) => {
+        setLocation(position);
+        console.log(position);
+      },
+      (error) => {
+        Alert.alert(`Code ${error.code}`, error.message);
+        setLocation(null);
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: highAccuracy,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: forceLocation,
+        forceLocationManager: useLocationManager,
+        showLocationDialog: locationDialog,
+      },
+    );
+  };
 
-    BackgroundGeolocation.on('background', () => {
-      console.log('[INFO] App is in background');
-    });
+  const getLocationUpdates = async () => {
+    const hasPermission = await hasLocationPermission();
 
-    BackgroundGeolocation.on('foreground', () => {
-      console.log('[INFO] App is in foreground');
-    });
+    if (!hasPermission) {
+      return;
+    }
 
-    BackgroundGeolocation.on('abort_requested', () => {
-      console.log('[INFO] Server responded with 285 Updates Not Required');
+    if (Platform.OS === 'android' && foregroundService) {
+      await startForegroundService();
+    }
 
-      // Here we can decide whether we want stop the updates or not.
-      // If you've configured the server to return 285, then it means the server does not require further update.
-      // So the normal thing to do here would be to `BackgroundGeolocation.stop()`.
-      // But you might be counting on it to receive location updates in the UI, so you could just reconfigure and set `url` to null.
-    });
+    setObserving(true);
 
-    BackgroundGeolocation.on('http_authorization', () => {
-      console.log('[INFO] App needs to authorize the http requests');
+    watchId.current = Geolocation.watchPosition(
+      (position) => {
+        setLocation(position);
+        console.log(position);
+      },
+      (error) => {
+        setLocation(null);
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: highAccuracy,
+        distanceFilter: 0,
+        interval: 5000,
+        fastestInterval: 2000,
+        forceRequestLocation: forceLocation,
+        forceLocationManager: useLocationManager,
+        showLocationDialog: locationDialog,
+        useSignificantChanges: significantChanges,
+      },
+    );
+  };
+
+  const removeLocationUpdates = useCallback(() => {
+    if (watchId.current !== null) {
+      stopForegroundService();
+      Geolocation.clearWatch(watchId.current);
+      watchId.current = null;
+      setObserving(false);
+    }
+  }, [stopForegroundService]);
+
+  const startForegroundService = async () => {
+    if (Platform.Version >= 26) {
+      await VIForegroundService.getInstance().createNotificationChannel({
+        id: 'locationChannel',
+        name: 'Location Tracking Channel',
+        description: 'Tracks location of user',
+        enableVibration: false,
+      });
+    }
+
+    return VIForegroundService.getInstance().startService({
+      channelId: 'locationChannel',
+      id: 420,
+      title: 'THEA-GS', //appConfig.displayName,
+      text: 'Collecting GPS location...',
+      icon: 'ic_launcher',
     });
-		
-  }
+  };
+
+  const stopForegroundService = useCallback(() => {
+    VIForegroundService.getInstance().stopService().catch((err) => err);
+  }, []);
+  //---------------------------------------------
+ 
   
   const beginTracking = () => {
-		BackgroundGeolocation.checkStatus(status => {
-		  console.log('[INFO] BackgroundGeolocation service is running', status.isRunning);
-		  console.log('[INFO] BackgroundGeolocation services enabled', status.locationServicesEnabled);
-		  console.log('[INFO] BackgroundGeolocation auth status: ' + status.authorization);
-
-		  // you don't need to check status before start (this is just the example)
-		  if (!status.isRunning) {
-			BackgroundGeolocation.start(); //triggers start on start event
-		  }
-		  props.dispatch(startTracking());
-		});
+		getLocationUpdates();
+		//setTracking(true);
 	}
 	
   const endTracking = () => {
-  	console.log('[INFO] end Tracking');
-  	
-  	//BackgroundGeolocation.removeAllListeners();
-  	BackgroundGeolocation.stop();
-  	props.dispatch(stopTracking());
+  	removeLocationUpdates();
+	//setTracking(false);
   }
 	
 	const toggleTracking = () => {

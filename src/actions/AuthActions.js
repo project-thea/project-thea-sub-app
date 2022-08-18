@@ -222,7 +222,7 @@ export function doAutoAuth(){
 export function registerSujbect({phone, firstname, lastname, email, nationality, dateOfBirth, nextOfKin, nextOfKinPhone, idNumber, idType}){
   return async (dispatch, getState) => {
   	dispatch(registeringSubject());
-  	
+  	console.log('++++++++++++++++++++++++++++++++++++++++++');
   	try {
   	  const unique_id = uuid.v4();
   	  const api = getFrisbee();
@@ -242,6 +242,8 @@ export function registerSujbect({phone, firstname, lastname, email, nationality,
   	  	}
   	  });
 
+	  console.log('+++++++++++++++++++++++++++++++');
+      console.log(res);
   	  if (res.err) {
   	  	dispatch(setRegistrationError('Error Registering. Try again!'));
   	  	return;
@@ -251,6 +253,8 @@ export function registerSujbect({phone, firstname, lastname, email, nationality,
   	  
   	  dispatch(saveUserDetails(res.body.data));
   	}catch(e){
+	  console.log('00000000000000000000000000000000000');
+	  console.log(e);
 	  dispatch(setRegistrationError('Error Registering. Check network connectivity!'));
   	}
   			
