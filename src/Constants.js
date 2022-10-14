@@ -1,6 +1,4 @@
-//export const API_BASE_URL = __DEV__ ? 'http://192.168.1.6:8000' : 'https://demo.project-thea.org'
-export const API_BASE_URL = 'https://demo.project-thea.org'
-
+export const API_BASE_URL = __DEV__ ? 'http://192.168.1.6:8000' : 'https://demo.project-thea.org'
 
 const Frisbee = require('frisbee'); 
 

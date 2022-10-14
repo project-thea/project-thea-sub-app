@@ -71,6 +71,14 @@ const Login = (props) => {
 		/>
 
 
+		<View style={{marginHorizontal: 10, marginTop: 10 }}>
+			<Icon 
+			  style={{alignSelf: 'flex-end'}}
+			  onPress={() => props.navigation.navigate('ConfigureServer') }
+			  raised
+			  name="cog" size={24}/>
+		</View>
+		
 		{
 		//<Button
 		//  title="Register"
