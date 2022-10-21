@@ -40,6 +40,7 @@ const AutoLogin = (props) => {
 		  onPress={() => props.dispatch(doAutoAuth())}
 		/>) : null}
 		
+		
 		<Button
 		  title="Continue to login"
 		  type="outline"

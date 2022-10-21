@@ -38,6 +38,7 @@ import TestDetails from './src/screens/TestDetails';
 import Info from './src/screens/Info';
 import Settings from './src/screens/Settings';
 import Register from './src/screens/Register';
+import ConfigureServer from './src/screens/ConfigureServer';
 
 const AppNavigator = createStackNavigator({
 	Login: {
@@ -67,6 +68,10 @@ const AppNavigator = createStackNavigator({
 	},
 	Register: {
 		screen: Register
+	},
+	ConfigureServer: {
+		screen: ConfigureServer,
+		title: 'Configure Server URL'
 	}
 },
 {

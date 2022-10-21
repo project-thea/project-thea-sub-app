@@ -1,4 +1,4 @@
-package com.projecttheasubapp;
+package com.projectthea.app;
 
 import android.app.Application;
 import android.content.Context;

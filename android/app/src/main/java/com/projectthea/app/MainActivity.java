@@ -1,4 +1,4 @@
-package com.projecttheasubapp;
+package com.projectthea.app;
 
 import com.facebook.react.ReactActivity;
 
