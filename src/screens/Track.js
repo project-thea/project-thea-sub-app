@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
 });
 
 function mapStateToProps(state) {
-	const user_id = state.auth.userDetails.id ? state.auth.userDetails.id : 0;
+	const user_id = state.auth.userDetails ? state.auth.userDetails.id : 0;
 	return { 
 		uploadURL: state.settings.uploadURL,
 		tracking: state.track.tracking,

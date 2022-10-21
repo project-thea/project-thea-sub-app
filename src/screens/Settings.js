@@ -12,9 +12,17 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Input, Button, ListItem, Divider } from 'react-native-elements';
 import Colors from '../shared/Colors';
 import Footer from '../shared/Footer';
-import { deleteSubject, updateSubject } from '../actions/AuthActions';
+import { deleteSubject, updateSubject, deleteAccount } from '../actions/AuthActions';
 
 const Settings = (props) => {
+	
+	console.log("000000000000000000000000000000000000000000000000000000");
+	console.log("props.userDetails:", props.userDetails);
+	if(props.userDetails === null || props.userDetails === undefined){
+	  console.log("999999999999999999999999999999999999999999999999999999");
+	  props.navigation.navigate('Login');
+	}
+	
   const [firstname, setFirstname] = useState(props.userDetails.first_name);
   const [lastname, setLastname] = useState(props.userDetails.last_name);
   const [othernames, setOthernames] = useState(props.userDetails.othernames);
@@ -221,8 +229,9 @@ const Settings = (props) => {
 						backgroundColor: 'red'
 					}}
 				  
-					onPress={
-						() => props.dispatch(deleteSubject())
+					onPress={() => { 
+						props.dispatch(deleteAccount(() => props.navigation.navigate('Login')));
+						}
 					}
 				/>
 			</View>

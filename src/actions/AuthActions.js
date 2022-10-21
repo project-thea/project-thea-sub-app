@@ -173,6 +173,16 @@ export function logout(){
   }
 }
 
+
+export function deleteAccount(callBack){
+  return async (dispatch, getState) => {
+  	dispatch(logout());
+	if(typeof callBack === 'function') callBack();
+  }
+}
+
+
+
 export function tryAutoAuth(){
   return {
   	type: TRY_AUTO_AUTH
@@ -222,7 +232,7 @@ export function doAutoAuth(){
 export function registerSujbect({phone, firstname, lastname, email, nationality, dateOfBirth, nextOfKin, nextOfKinPhone, idNumber, idType}){
   return async (dispatch, getState) => {
   	dispatch(registeringSubject());
-  	console.log('++++++++++++++++++++++++++++++++++++++++++');
+  
   	try {
   	  const unique_id = uuid.v4();
   	  const api = getFrisbee();
